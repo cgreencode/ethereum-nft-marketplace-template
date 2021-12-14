@@ -1,12 +1,14 @@
-# `ethereum-marketplace-template`
+# `ethereum-boilerplate-NFT-Marketplace`
 
+
+![Preview](preview.gif)
 
 # ⭐️ `Star us`
 If this boilerplate helps you build Ethereum dapps faster - please star this project, every star makes us very happy!
 
 # 🚀 Quick Start
 
-📄 Clone or fork `ethereum-nft-marketplace-template`:
+📄 Clone or fork `ethereum-nft-marketplace-boilerplate`:
 ```sh
 git clone 
 ```
