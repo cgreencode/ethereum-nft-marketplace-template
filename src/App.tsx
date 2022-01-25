@@ -1,21 +1,19 @@
 // @ts-nocheck
 import { useEffect, useState } from 'react';
-import { useMoralis, useMoralisQuery } from 'react-moralis';
-import { BrowserRouter as Router, Switch, Route, NavLink, Redirect } from 'react-router-dom';
+import {useChain, useMoralis} from 'react-moralis';
+import { BrowserRouter as Router, Switch, Route, NavLink } from 'react-router-dom';
 import Account from 'components/Account/Account';
 import Chains from 'components/Chains';
-import NFTBalance from 'components/NFTBalance';
+import NFTBalanceTable from "./components/NFTBalance";
 import UserDashboard from 'components/User/UserDashboard';
 import { Menu, Layout } from 'antd';
 import 'antd/dist/antd.css';
 import NativeBalance from 'components/NativeBalance';
 import './style.css';
 import Web3 from 'web3';
-import { Adder } from 'views/Admin/Module/Adder';
 import Marketplace from 'views/Admin/components/NFT/Marketplace';
 import useProtocol from 'views/Admin/Module/contracts/Protocol/useProtocol';
 import Admin from 'views/Admin/Admin';
-import { ConnectButton } from 'web3uikit';
 const { Header, Footer } = Layout;
 
 const styles = {
@@ -49,24 +47,26 @@ const styles = {
     },
 };
 const App = () => {
-    const { enableWeb3, isAuthenticated, account, provider, web3 } = useMoralis();
+    const { enableWeb3, account, provider } = useMoralis();
     const { marketplaceAddress, hasMarketplace, canSetProject, AdminAddress, isLoading } = useProtocol();
+    const { chainId } = useChain();
+    const [web3, setWeb3] = useState<any>();
 
-    // useEffect(() => {
-    //     enableWeb3();
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, []);
+    useEffect(() => {
+        enableWeb3();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-    // useEffect(() => {
-    //     console.log('is loading', isLoading);
-    // }, [isLoading]);
+    useEffect(() => {
+        console.log('is loading', isLoading);
+    }, [isLoading]);
 
-    // useEffect(() => {
-    //     if (provider) {
-    //         let web = new Web3(provider as any);
-    //         setWeb3(web);
-    //     }
-    // }, [provider]);
+    useEffect(() => {
+        if (provider) {
+            let web = new Web3(provider as any);
+            setWeb3(web);
+        }
+    }, [provider]);
 
     return (
         // @ts-ignore
@@ -109,7 +109,7 @@ const App = () => {
                         <div style={styles.headerRight}>
                             <Chains />
                             <NativeBalance />
-                            <ConnectButton />
+                            <Account />
                         </div>
                     </Header>
                     <div style={styles.content}>
@@ -121,7 +121,7 @@ const App = () => {
                                     </Route>
                                 )}
                             <Route path="/NFTBalance">
-                                <NFTBalance marketplace={marketplaceAddress} />
+                                <NFTBalanceTable address={account} chain={chainId} marketplace={marketplaceAddress} />
                             </Route>
                             {hasMarketplace && (
                                 <Route path="/user">
