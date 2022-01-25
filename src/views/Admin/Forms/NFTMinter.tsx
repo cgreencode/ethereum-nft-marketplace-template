@@ -56,7 +56,6 @@ const NFTMinterForm: React.FC<INFTMinterForm> = ({ web3, address }) => {
                         name: 'Name',
                         type: 'text',
                         value: '',
-                        inputWidth: "100%",
                         validation: {
                             required: true,
                         },
@@ -65,7 +64,6 @@ const NFTMinterForm: React.FC<INFTMinterForm> = ({ web3, address }) => {
                         name: 'Image URL',
                         type: 'text',
                         value: '',
-                        inputWidth: "100%",
                         validation: {
                             required: true,
                         },
@@ -74,7 +72,6 @@ const NFTMinterForm: React.FC<INFTMinterForm> = ({ web3, address }) => {
                         name: 'Symbol',
                         type: 'text',
                         value: '',
-                        inputWidth: "100%",
                         validation: {
                             required: true,
                         },
@@ -83,13 +80,10 @@ const NFTMinterForm: React.FC<INFTMinterForm> = ({ web3, address }) => {
                         name: 'Description',
                         type: 'text',
                         value: '',
-                        inputWidth: "100%",
-
                     },
                     {
                         name: 'To Address',
                         type: 'text',
-                        inputWidth: "100%",
                         value: account,
                         validation: {
                             required: true,

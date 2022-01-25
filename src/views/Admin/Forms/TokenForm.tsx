@@ -51,7 +51,6 @@ const TokenForm: React.FC = ({ web3 }) => {
                     {
                         name: 'Token Name',
                         type: 'text',
-                        inputWidth: "100%",
                         value: '',
                         validation: {
                             required: true
@@ -60,7 +59,6 @@ const TokenForm: React.FC = ({ web3 }) => {
                     {
                         name: 'Token Symbol',
                         type: 'text',
-                        inputWidth: "100%",
                         value: '',
                         validation: {
                             required: true
