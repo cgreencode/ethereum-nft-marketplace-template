@@ -1,8 +1,7 @@
-// @ts-nocheck
-import { useChain, useMoralisWeb3Api, useMoralisWeb3ApiCall } from 'react-moralis';
+import { useChain, useMoralis, useMoralisWeb3Api, useMoralisWeb3ApiCall } from 'react-moralis';
 import { Image } from 'antd';
 import React, { useEffect, useState } from 'react';
-import {Table, Button, Illustration} from 'web3uikit';
+import { Table, Button } from 'web3uikit';
 import NFTMinterForm from '../../Forms/NFTMinter';
 import useProtocol from '../../Module/contracts/Protocol/useProtocol';
 import NFTLister from '../../Forms/NFTLister';
@@ -97,41 +96,20 @@ export const CollectionList: React.FC<ICollectionList> = ({ address, web3 }) => 
     }, [data]);
 
     return (
-        <div style={{display: "grid"}}>
-            <div style={{display: "flex", flexDirection: "row-reverse", marginBottom: "15px"}}>
-                {!showMinter && (
-                    // @ts-ignore
-                    <Button theme={'primary'} text={'Mint NFT'} icon={'plus'} iconLayout={'leading'} onClick={() => setShowMinter(true)} />
-                )}
-            </div>
+        <div>
+            {!showMinter && (
+                /* @ts-ignore */
+                <Button theme={'primary'} text={'Mint NFT'} icon={'plus'} iconLayout={'leading'} onClick={() => setShowMinter(true)} />
+            )}
             {!showMinter && (
                 <Table
                     columnsConfig="80px 90px 2fr 1fr"
                     data={tableData}
-                    header={[
-                        <div style={{...columnNameStyle, marginLeft: "15px"}}>
-                            <span>#</span>
-                        </div>,
-                        <div style={columnNameStyle}>
-                            <span>Logo</span>
-                        </div>,
-                        <div style={columnNameStyle}>
-                            <span>Name</span>
-                        </div>,
-                        <div style={columnNameStyle}>
-                            <span>Actions</span>
-                        </div>
-                    ]}
+                    header={['#', <span>Logo</span>, <span>Name</span>, <span>Actions</span>]}
                     maxPages={3}
                     onPageNumberChanged={function noRefCheck() {}}
                     pageSize={5}
-                    customNoDataComponent={
-                        <div>
-                            <Illustration logo={"servers"} width={"150"} height={"150"} />
-                            <span>{!isEmpty ? 'Loading ...' : 'Collection is empty'}</span>
-                            {!isEmpty ? '' : <Button theme={'primary'} text={'Mint First NFT'} icon={'plus'} iconLayout={'leading'} onClick={() => setShowMinter(true)} />}
-                        </div>
-                    }
+                    customNoDataText={!isEmpty ? 'Loading ...' : 'Collection is empty'}
                 />
             )}
             {showMinter && <NFTMinterForm address={address} web3={web3} />}
@@ -142,14 +120,3 @@ export const CollectionList: React.FC<ICollectionList> = ({ address, web3 }) => 
         </div>
     );
 };
-
-const columnNameStyle = {
-    color: "#68738D",
-    fontWeight: "500",
-    fontSize: "14px",
-    display: 'grid',
-    placeItems: "flex-start",
-    width: "100%",
-    marginTop: "5px",
-    marginBottom: "-5px"
-}

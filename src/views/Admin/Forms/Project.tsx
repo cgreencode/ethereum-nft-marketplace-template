@@ -10,7 +10,7 @@ const ProjectForm: React.FC = ({ deployProtocol, deployErr, setLoading, isLoadin
 
     const { saveFile } = useMoralisFile();
 
-    const deploy = (name: string, description: string, masterKey: string) => {
+    const deploy = (name: string, description: string) => {
         setLoading(true)
         let metadata = {
             name: name,
@@ -27,7 +27,7 @@ const ProjectForm: React.FC = ({ deployProtocol, deployErr, setLoading, isLoadin
 
         ).then((e) => {
             const hash = (e as any)["_hash"]
-            deployProtocol(`ipfs://${hash}`, masterKey)
+            deployProtocol(`ipfs://${hash}`)
         })
 
     }
@@ -64,18 +64,9 @@ const ProjectForm: React.FC = ({ deployProtocol, deployErr, setLoading, isLoadin
                                 required: true
                             },
                         },
-                        {
-                            name: 'Moralis MasterKey',
-                            type: 'text',
-                            value: '',
-                            inputWidth: "100%",
-                            validation: {
-                                required: true
-                            },
-                        },
                     ]}
                     onSubmit={(e) => {
-                        deploy(e.data[0].inputResult, e.data[1].inputResult, e.data[2].inputResult)
+                        deploy(e.data[0].inputResult, e.data[1].inputResult)
                     }}
                     title="Deploy Project"
                 />

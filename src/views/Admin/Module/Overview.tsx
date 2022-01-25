@@ -16,13 +16,14 @@ import {
     LinkTo,
     Table,
     Tag,
-    Modal, Input, Illustration,
+    Modal,
 } from 'web3uikit';
 import Marketplace from '../components/NFT/Marketplace';
 import Token from '../components/Token';
 import { CollectionList } from '../components/NFT/CollectionList';
 import { getExplorer } from '../../../helpers/networks';
 import Moralis from 'moralis';
+import { MasterKey, ProjectChainId } from '../index';
 
 export default function Overview({ protocolAddress, web3 }) {
     const [modules, setModules] = useState([]);
@@ -38,7 +39,6 @@ export default function Overview({ protocolAddress, web3 }) {
     const [selectedModule, setSelectedModule] = useState(null);
     const [showModal, setShowModal] = useState<boolean>(false);
     const [isLoading, setLoading] = useState<boolean>(true);
-    const [masterKey, setMasterKey ] = useState<string>("")
     const { fetch: fetchWeb3 } = useWeb3ExecuteFunction();
     const [tableData, setTableData] = useState([]);
 
@@ -182,9 +182,9 @@ export default function Overview({ protocolAddress, web3 }) {
         }
     };
 
-    const runCf = async (masterKey: string) => {
-        if (!protocolAddress || !chainId) return;
-        Moralis.masterKey = masterKey;
+    const runCf = async () => {
+        if (!protocolAddress || !ProjectChainId) return;
+        Moralis.masterKey = MasterKey;
         const options = { tableName: 'Modules' };
         await Moralis.Cloud.run('unwatchContractEvent', options, {
             useMasterKey: true,
@@ -192,7 +192,7 @@ export default function Overview({ protocolAddress, web3 }) {
         await Moralis.Cloud.run(
             'watchContractEvent',
             {
-                ["chainId" as any]: chainId,
+                chainId: ProjectChainId,
                 address: protocolAddress,
                 topic: 'ModuleUpdated(bytes32, address)',
                 abi: {
@@ -242,25 +242,21 @@ export default function Overview({ protocolAddress, web3 }) {
                 maxPages={3}
                 onPageNumberChanged={function noRefCheck() {}}
                 pageSize={5}
-                customNoDataComponent={
+                customNoDataText={
                     <div
                         style={{
                             display: 'grid',
                             placeItems: 'center',
+                            width: '30vw',
                             textAlign: 'center',
-                            gap: "25px"
                         }}
                     >
-                        <Illustration logo={"servers"} width={"150"} height={"150"} />
-                        <span>It looks like there are no Modules</span>
+                        <>It looks like there is no data</>
                         <span>
                             If you think this is an error click to force re-sync
                         </span>
-                        <Input validation={{ required: true }} label={"Moralis Masterkey"} onChange={(e) => setMasterKey((e as any).target.value)} type={"text"} />
                         <Button
-                            isFullWidth
-
-                            onClick={() => runCf(masterKey)}
+                            onClick={() => runCf()}
                             theme={'primary'}
                             text={'Force Sync'}
                         />

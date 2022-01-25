@@ -45,7 +45,6 @@ const NFTMinterForm: React.FC<INFTMinterForm> = ({ web3, address }) => {
                 <Notification isVisible={!!deployErr} message={deployErr ? deployErr.message : ''} title={'Error'} />
             </div>
             <Form
-                id={"form-mint-nft"}
                 buttonConfig={{
                     isFullWidth: true,
                     text: 'Mint',
@@ -105,7 +104,7 @@ const NFTMinterForm: React.FC<INFTMinterForm> = ({ web3, address }) => {
                     const to = e.data[4].inputResult;
                     mintNFT({ name, image, symbol, description, to });
                 }}
-                title="Mint NFT"
+                title="NFT Collection"
             />
         </>
     );
