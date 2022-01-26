@@ -1,27 +1,24 @@
 import { useEffect, useState } from "react";
 import {useChain, useMoralis, useMoralisQuery, useNewMoralisObject, useWeb3ExecuteFunction} from "react-moralis";
-import { RegistryAddress} from '../../../index'
+import { ProjectChainId, RegistryAddress} from '../../../index'
 import registryInterface from "./interface";
 
 const useRegistry = () => {
     const { data } = useMoralisQuery("Storefront", query => query.limit(2), [], {
-        autoFetch: true,
-        live: true
+        autoFetch: true
     })
     const [ protocolAddress, setProtocolAddress ] = useState<string | null>(null);
     const [ protocolAdmin, setProtocolAdmin ] = useState<string | null>(null)
     const [ hasProject, setHasProject ] = useState<boolean>(false);
     const [ canSetProject, setCanSetProject ] = useState<boolean>(false);
     const [ isLoading, setLoading ] = useState<boolean>(true);
-    const [ forwarder, setForwarder ] = useState<string | unknown>();
     const { fetch: getProtocol } = useWeb3ExecuteFunction();
     const { save } = useNewMoralisObject("Storefront")
     const { error: deployErr, fetch: deployFetch } = useWeb3ExecuteFunction();
-    const { fetch: fetchForwarder  } = useWeb3ExecuteFunction();
+    const { data: forwarder, fetch: fetchForwarder  } = useWeb3ExecuteFunction();
     const { deployProtocolAbi, getProtocolControlAbi, getForwarderAbi } = registryInterface();
     const { account, provider, Moralis } = useMoralis()
     const { chainId } = useChain()
-    const [ projectChain, setProjectChain ] = useState<typeof chainId>()
 
     useEffect(() => {
         if(provider) {
@@ -44,18 +41,21 @@ const useRegistry = () => {
             console.log(`Project Address = ${data[0].get('protocol')}`)
             console.log(`Project Chain = ${data[0].get('chain')}`)
             setCanSetProject(false)
-            setProjectChain(data[0].get('chain'))
             setHasProject(true)
             setProtocolAdmin(data[0].get('admin'))
             setProtocolAddress(data[0].get('protocol'))
+            setLoading(false)
         }
     }, [ data ])
 
 
-    const runCf = async (protocolAddress: string, masterKey: string) => {
+    const runCf = async (masterKey: string) => {
+        if(!protocolAddress || !ProjectChainId) return
         Moralis.masterKey = masterKey
+        const options = {"tableName": "Modules"}
+        await Moralis.Cloud.run("unwatchContractEvent", options, {useMasterKey:true});
         await Moralis.Cloud.run("watchContractEvent", {
-            chainId: chainId,
+            chainId: ProjectChainId,
             address: protocolAddress,
             topic: "ModuleUpdated(bytes32, address)",
             abi: {
@@ -90,6 +90,8 @@ const useRegistry = () => {
      * @param masterKey masterKey to sync events
      */
     const deployProtocol = (uri: string, masterKey: string) => {
+        console.log("deploy")
+        setLoading(true)
         deployFetch({
             params: {
                 abi: [
@@ -103,11 +105,8 @@ const useRegistry = () => {
             },
             onSuccess: results => {
                 (results as any).wait().then((e) => {
-                    runCf(e.logs[0].address, masterKey).then()
-                    save({admin: account, uri: uri, protocol: e.logs[0].address, chain: chainId}).then(console.log).catch(console.log).then( () => {
-                        setCanSetProject(false)
-                        setLoading(false)
-                    })
+                    save({admin: account, uri: uri, protocol: e.logs[0].address, chain: chainId}).then(console.log).catch(console.log);
+                    runCf(masterKey).then(console.log)
                 })
             },
             onError: () => setLoading(false),
@@ -133,7 +132,7 @@ const useRegistry = () => {
                     index: "1"
                 }
             },
-            onSuccess: () => {
+            onSuccess: results => {
                 setLoading(false);
             },
             onError: error => console.log(error)
@@ -149,7 +148,7 @@ const useRegistry = () => {
                 contractAddress: RegistryAddress,
                 functionName: "forwarder",
             },
-            onSuccess: results => setForwarder(results),
+            onSuccess: results => console.log(`forwarder: ${results}`),
             onError: error => console.log(error)
         }).then(() => {}).catch(() => setLoading(false))
     }
@@ -159,7 +158,6 @@ const useRegistry = () => {
         getProtocolByUser,
         getForwarder,
         protocolAdmin,
-        projectChain,
         forwarder,
         canSetProject,
         hasProject,

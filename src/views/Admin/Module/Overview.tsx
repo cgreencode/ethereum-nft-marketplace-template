@@ -25,6 +25,7 @@ import { getExplorer } from '../../../helpers/networks';
 import Moralis from 'moralis';
 
 export default function Overview({ protocolAddress, web3 }) {
+    const [modules, setModules] = useState([]);
     const [limit] = useState(100);
     // Get installed modules
     const { data } = useMoralisQuery(
@@ -44,6 +45,7 @@ export default function Overview({ protocolAddress, web3 }) {
     useEffect(() => {
         if (data && data.length > 0) {
             setLoading(true);
+            setModules([]);
             setTableData([]);
             data.forEach(async (mod, index) => {
                 await fetchWeb3({
@@ -87,6 +89,26 @@ export default function Overview({ protocolAddress, web3 }) {
                             data.length
                         );
 
+                        setModules((prevState) =>
+                            [...prevState] !== []
+                                ? [
+                                      ...prevState,
+                                      {
+                                          type: typeText,
+                                          module: mod.get('module'),
+                                          key: mod.get('module'),
+                                          metadata,
+                                      },
+                                  ]
+                                : [
+                                      {
+                                          type: typeText,
+                                          module: mod.get('module'),
+                                          key: mod.get('module'),
+                                          metadata,
+                                      },
+                                  ]
+                        );
                         setTableData((prevState) =>
                             [...prevState] !== []
                                 ? [
@@ -97,14 +119,10 @@ export default function Overview({ protocolAddress, web3 }) {
                         );
                     },
                 });
-                console.log(`dat`)
-                if (index === data.length - 1) {
-                    console.log('trigger')
+                if (index === modules.length - 1) {
                     setLoading(false);
                 }
             });
-        } else {
-            setLoading(false)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [data]);
@@ -151,7 +169,7 @@ export default function Overview({ protocolAddress, web3 }) {
     ];
 
     const printModuleInModal = (type, selectedModule) => {
-        if (type === 'NFT MarketplaceForm') {
+        if (type === 'NFT Marketplace') {
             return <Marketplace web3={web3} address={selectedModule.module} />;
         }
         if (type === 'NFT Collection') {
@@ -225,28 +243,28 @@ export default function Overview({ protocolAddress, web3 }) {
                 onPageNumberChanged={function noRefCheck() {}}
                 pageSize={5}
                 customNoDataComponent={
-                     !isLoading ? <div
-                    style={{
-                    display: 'grid',
-                    placeItems: 'center',
-                    textAlign: 'center',
-                    gap: "25px"
-                }}
+                    <div
+                        style={{
+                            display: 'grid',
+                            placeItems: 'center',
+                            textAlign: 'center',
+                            gap: "25px"
+                        }}
                     >
-                    <Illustration logo={"servers"} width={"150"} height={"150"} />
-                    <span>It looks like there are no Modules</span>
-                    <span>
-                    If you think this is an error click to force re-sync
-                    </span>
-                    <Input validation={{required: true}} label={"Moralis Masterkey"} onChange={(e) => setMasterKey((e as any).target.value)} type={"text"} />
-                    <Button
-                    isFullWidth
+                        <Illustration logo={"servers"} width={"150"} height={"150"} />
+                        <span>It looks like there are no Modules</span>
+                        <span>
+                            If you think this is an error click to force re-sync
+                        </span>
+                        <Input validation={{ required: true }} label={"Moralis Masterkey"} onChange={(e) => setMasterKey((e as any).target.value)} type={"text"} />
+                        <Button
+                            isFullWidth
 
-                    onClick={() => runCf(masterKey)}
-                    theme={'primary'}
-                    text={'Force Sync'}
-                    />
-                    </div> : <div>Loading Modules ...</div>
+                            onClick={() => runCf(masterKey)}
+                            theme={'primary'}
+                            text={'Force Sync'}
+                        />
+                    </div>
                 }
             />
             <Modal

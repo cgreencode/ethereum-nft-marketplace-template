@@ -7,12 +7,11 @@ import useRegistry from "../Registry/useRegistry";
 const useProtocol = () => {
     const [ marketplaceAddress, setMarketplaceAddress ] = useState();
     const [ hasMarketplace, setHasMarketplace ] = useState<boolean>(false);
-    const { protocolAddress, forwarder, canSetProject, isLoading, protocolAdmin: AdminAddress, projectChain } = useRegistry();
-    const { fetch: fetchAddModule } = useWeb3ExecuteFunction();
+    const { protocolAddress, forwarder, canSetProject, isLoading, protocolAdmin: AdminAddress } = useRegistry();
+    const { data: dataAddModule, fetch: fetchAddModule } = useWeb3ExecuteFunction();
     const { data: dataModuleById, fetch: fetchModuleById } = useWeb3ExecuteFunction();
     const { data: dataWithdrawFunds, fetch: fetchWithdrawFunds } = useWeb3ExecuteFunction();
     const { data: dataHasAdminRole, fetch: fetchHasAdminRole } = useWeb3ExecuteFunction();
-    const [ addingModule, setIsAddingModule ] = useState<boolean>(false)
     const { addModuleAbi, getModulesAbi, withdrawFundsAbi, hasRoleAbi } = protocolInterface();
 
     useEffect(() => {
@@ -29,6 +28,15 @@ const useProtocol = () => {
         // eslint-disable-next-line
     }, [ protocolAddress ])
 
+    useEffect(() => {
+        if(dataModuleById) {
+            if(dataModuleById === "0x0000000000000000000000000000000000000000") return;
+            setMarketplaceAddress(dataModuleById)
+            setHasMarketplace(true)
+            console.log(`found marketplace at ${dataModuleById}`)
+        }
+    }, [dataModuleById])
+
     /**
      * binds deployed contracts to the project.
      * note: contract does not make input validation.
@@ -36,7 +44,6 @@ const useProtocol = () => {
      * @param moduleAddress should be deployed contracts that are not added to project yet
      */
     const addModule = (moduleType: number, moduleAddress: string) => {
-        setIsAddingModule(true)
         fetchAddModule({
             params: {
                 abi: [ addModuleAbi ],
@@ -47,13 +54,8 @@ const useProtocol = () => {
                     _moduleType: moduleType
                 }
             },
-            onSuccess: (tx) => {
-                tx.wait(() => {
-                    setIsAddingModule(false)
-                })
-            },
-            onError: () => setIsAddingModule(false)
-        }).then();
+            onSuccess: (tx) => { console.log(tx) }
+        }).then((e) => console.log(e));
     }
 
     /**
@@ -96,7 +98,7 @@ const useProtocol = () => {
                         console.log('no marketplace found')
                         return;
                     }
-                    setMarketplaceAddress(results)
+                    setMarketplaceAddress(dataModuleById)
                     setHasMarketplace(true)
                     console.log(`found marketplace at ${results}`)
                     return;
@@ -136,15 +138,14 @@ const useProtocol = () => {
 
     return {
         addModule,
-        addingModule,
         checkIfUserIsAdmin,
         dataHasAdminRole,
-        projectChain,
         canSetProject,
         dataModuleById,
         isLoading,
         AdminAddress,
         dataWithdrawFunds,
+        dataAddModule,
         forwarder,
         protocolAddress,
         getModuleById,

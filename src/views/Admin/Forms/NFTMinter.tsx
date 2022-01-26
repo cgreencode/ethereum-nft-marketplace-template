@@ -51,7 +51,6 @@ const NFTMinterForm: React.FC<INFTMinterForm> = ({ web3, address }) => {
                     text: 'Mint',
                     disabled: isLoading,
                     theme: !isLoading ? 'primary' : 'secondary',
-                    onClick: () => console.log('submitting ...')
                 }}
                 data={[
                     {

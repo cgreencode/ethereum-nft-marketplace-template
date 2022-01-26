@@ -41,12 +41,10 @@ const TokenForm: React.FC = ({ web3 }) => {
     return (
         <>
             <Form
-                id={"token-form-id"}
                 buttonConfig={{
                     isFullWidth: true,
                     text: "Deploy Token",
-                    theme: "primary",
-                    onClick: () => console.log('submitting ...')
+                    theme: "primary"
                 }}
 
                 data={[

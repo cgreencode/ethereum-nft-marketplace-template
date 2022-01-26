@@ -1,5 +1,4 @@
-import {useWeb3ExecuteFunction, useWeb3Transfer} from "react-moralis";
-import {useState} from "react";
+import {useWeb3ExecuteFunction} from "react-moralis";
 
 const approveAbi = {
     "inputs": [
@@ -48,9 +47,6 @@ const useERC721 = () => {
 
     const { fetch: fetchApprove } = useWeb3ExecuteFunction();
     const { fetch: fetchIsApprove, data: isApprovedResult } = useWeb3ExecuteFunction();
-    const { fetch: transferNft } = useWeb3Transfer();
-    const [ transferSuccess, setTransferSuccess ] = useState<boolean | Error>(false);
-    const [ isTransferring, setIsTransferring ] = useState<boolean>(false);
 
     const approve = (contractAddress: string, operator: string) => {
         fetchApprove({
@@ -80,35 +76,10 @@ const useERC721 = () => {
         }).then(() => {}).catch(() => {})
     }
 
-    const transfer = (tokenId: string, contractAddress: string, receiver: string) => {
-        setIsTransferring(true)
-        transferNft({
-            params: {
-                type: "erc721",
-                tokenId,
-                contractAddress,
-                receiver,
-            },
-            onSuccess: results => {
-                (results as any).wait().then(() => {
-                    setIsTransferring(false)
-                    setTransferSuccess(true)
-                })
-            },
-            onError: error => {
-                setTransferSuccess(error)
-                setIsTransferring(false)
-            }
-        }).then()
-    }
-
     return {
         approve,
         isApproved,
-        isApprovedResult,
-        isTransferring,
-        transferSuccess,
-        transfer
+        isApprovedResult
     }
 }
 
