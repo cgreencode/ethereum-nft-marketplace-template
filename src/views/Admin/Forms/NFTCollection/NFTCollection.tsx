@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { Form, Notification } from 'web3uikit';
+import { Form, Loading, Notification } from 'web3uikit';
 import React, { useState } from 'react';
 import useRegistry from '../../Module/contracts/Registry/useRegistry';
 import { useChain, useMoralis, useMoralisFile, useMoralisWeb3Api } from 'react-moralis';
@@ -8,15 +8,15 @@ import useProtocol from '../../Module/contracts/Protocol/useProtocol';
 import { HeaderStyled } from 'uikit/HeaderStyled';
 import { Typography } from 'uikit/Typography';
 import { Flex } from 'uikit/Flex/Flex';
-import { formconfig, stages } from './config';
+import { formConfig, stages } from './config';
 import { useHistory } from 'react-router';
 
 interface INFTCollectionForm {
     web3?: any;
 }
 const NFTCollectionForm: React.FC<INFTCollectionForm> = ({ web3 }) => {
-    const { deployErr } = useRegistry();
-    const { addModule, protocolAddress, forwarder, isAddingModule } = useProtocol();
+    const { deployErr, isLoading, setLoading } = useRegistry();
+    const { addModule, protocolAddress, forwarder } = useProtocol();
     const { token } = useMoralisWeb3Api();
     const { account } = useMoralis();
     const { saveFile } = useMoralisFile();
@@ -25,6 +25,7 @@ const NFTCollectionForm: React.FC<INFTCollectionForm> = ({ web3 }) => {
     const { push: pushToHistory } = useHistory();
 
     const uploadNFTCollection = (e: any) => {
+        setLoading(true);
         setStage('uploading');
         let metadata = {
             name: e.name,
@@ -42,7 +43,7 @@ const NFTCollectionForm: React.FC<INFTCollectionForm> = ({ web3 }) => {
                 saveIPFS: true,
                 onSuccess: (e) => deployNFTCollection(e, metadata),
             }
-        );
+        ).then();
     };
 
     const deployNFTCollection = async (e, metadata) => {
@@ -70,8 +71,10 @@ const NFTCollectionForm: React.FC<INFTCollectionForm> = ({ web3 }) => {
             chain: chainId as any,
         });
         setStage('isAddingModule');
-        addModule(2, receipt.contractAddress);
-        pushToHistory('/admin');
+        addModule(2, receipt.contractAddress).then(() => {
+                pushToHistory('/admin');
+            })
+            .finally(() => setLoading(false));
     };
 
     const onSubmit = ({ data }) => {
@@ -104,16 +107,16 @@ const NFTCollectionForm: React.FC<INFTCollectionForm> = ({ web3 }) => {
                 </div>
                 <Form
                     buttonConfig={{
-                        disabled: isAddingModule,
+                        disabled: isLoading,
                         isFullWidth: true,
-                        isLoading: isAddingModule,
+                        isLoading,
                         onClick: () => console.log(),
                         text: 'Deploy',
                         theme: 'primary',
                         type: 'button',
                         loadingText: stages[stage],
                     }}
-                    data={formconfig}
+                    data={formConfig}
                     onSubmit={onSubmit}
                     id={'s'}
                     title={''}

@@ -12,7 +12,7 @@ const useProtocol = () => {
     const { data: dataModuleById, fetch: fetchModuleById } = useWeb3ExecuteFunction();
     const { data: dataWithdrawFunds, fetch: fetchWithdrawFunds } = useWeb3ExecuteFunction();
     const { data: dataHasAdminRole, fetch: fetchHasAdminRole } = useWeb3ExecuteFunction();
-    const [isAddingModule, setIsAddingModule] = useState<boolean>(false);
+    const [addingModule, setIsAddingModule] = useState<boolean>(false);
     const { addModuleAbi, getModulesAbi, withdrawFundsAbi, hasRoleAbi } = protocolInterface();
 
     useEffect(() => {
@@ -35,7 +35,7 @@ const useProtocol = () => {
      * @param moduleType equals an index of the type array in src/helpers/module.js
      * @param moduleAddress should be deployed contracts that are not added to project yet
      */
-    const addModule = (moduleType: number, moduleAddress: string) => {
+    const addModule = async (moduleType: number, moduleAddress: string) => {
         setIsAddingModule(true);
         fetchAddModule({
             params: {
@@ -137,7 +137,7 @@ const useProtocol = () => {
 
     return {
         addModule,
-        isAddingModule,
+        addingModule,
         checkIfUserIsAdmin,
         dataHasAdminRole,
         projectChain,
