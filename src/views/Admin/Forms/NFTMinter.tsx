@@ -86,9 +86,6 @@ const NFTMinterForm: React.FC<INFTMinterForm> = ({ web3, address }) => {
                         type: 'text',
                         value: '',
                         inputWidth: '100%',
-                        validation: {
-                            required: true,
-                        },
                     },
                     {
                         name: 'To Address',

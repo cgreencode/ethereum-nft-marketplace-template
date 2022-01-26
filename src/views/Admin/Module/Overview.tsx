@@ -25,11 +25,12 @@ import { getExplorer } from '../../../helpers/networks';
 import Moralis from 'moralis';
 
 export default function Overview({ protocolAddress, web3 }) {
+    const [limit] = useState(100);
     // Get installed modules
     const { data } = useMoralisQuery(
         'Modules',
-        (query) => query.limit(100),
-        [],
+        (query) => query.limit(limit),
+        [limit],
         { live: true }
     );
     const { chainId } = useMoralis();
@@ -44,8 +45,8 @@ export default function Overview({ protocolAddress, web3 }) {
         if (data && data.length > 0) {
             setLoading(true);
             setTableData([]);
-            data.forEach((mod, index) => {
-                fetchWeb3({
+            data.forEach(async (mod, index) => {
+                await fetchWeb3({
                     params: {
                         abi: [
                             {
@@ -95,7 +96,8 @@ export default function Overview({ protocolAddress, web3 }) {
                                 : [rowData(metadata, typeText, mod)]
                         );
                     },
-                }).then();
+                });
+                console.log(`dat`)
                 if (index === data.length - 1) {
                     console.log('trigger')
                     setLoading(false);
@@ -149,7 +151,7 @@ export default function Overview({ protocolAddress, web3 }) {
     ];
 
     const printModuleInModal = (type, selectedModule) => {
-        if (type === 'NFT Marketplace') {
+        if (type === 'NFT MarketplaceForm') {
             return <Marketplace web3={web3} address={selectedModule.module} />;
         }
         if (type === 'NFT Collection') {

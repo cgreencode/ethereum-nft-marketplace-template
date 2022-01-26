@@ -1,26 +1,23 @@
 // @ts-nocheck
 
 import React, { useState } from 'react';
-import {getWrappedNative, Input, Modal, Select} from 'web3uikit';
+import { Input, Modal, Select } from 'web3uikit';
 import { useMoralis } from 'react-moralis';
-import { getWrappedNativeLogo, getWrappedNativeSymbol} from '../../../helpers/networks';
+import { getNativeByChain } from '../../../helpers/networks';
 import { useMarketplace } from '../Module/contracts/NFT/useMarketplace';
 import { Image } from 'antd';
 
-const NFTLister: React.FC = ({ nft, web3, marketplaceAddress, modalActive, setModalActive }) => {
+const NFTLister: React.FC = ({ nft, web3, marketplaceAddress }) => {
     const { chainId, Moralis, account } = useMoralis();
     const { listNFT } = useMarketplace(web3, marketplaceAddress, account);
-    const [currency, setCurrency] = useState<string>("");
+    const [currency, setCurrency] = useState<string>('0x0000000000000000000000000000000000000000');
     const [price, setPrice] = useState<string | number>();
 
     return (
         <Modal
-            isVisible={modalActive}
+            isVisible={true}
             okText={'List NFT'}
-            title={`List ${nft.metadata ? nft.metadata.name : nft.name} #${nft.token_id} For Sale`}
-            onCancel={() => {
-                setModalActive(false)
-            }}
+            title={`List ${nft.metadata.name} #${nft.token_id} For Sale`}
             onOk={() =>
                 listNFT(
                     nft.token_address,
@@ -49,42 +46,37 @@ const NFTLister: React.FC = ({ nft, web3, marketplaceAddress, modalActive, setMo
                     >
                         {
                             // @ts-ignore
-                            <Image src={nft.metadata && nft.metadata.image ? nft.metadata.image : 'https://i.ibb.co/FzDBLqk/Image.png'} />
+                            <Image src={nft.metadata.image ? nft.metadata.image : 'https://i.ibb.co/FzDBLqk/Image.png'} />
                         }
                     </div>
                     <div style={{color: "black", fontSize: "18px", display: "grid", placeItems: "center"}}>
-                        <p style={{fontWeight: 600}}>{`${nft.metadata ? nft.metadata.name : nft.name} #${nft.token_id}`}</p>
+                        <p style={{fontWeight: 600}}>{`${nft.metadata.name} #${nft.token_id}`}</p>
                         <p style={{fontSize: "12px"}}>{nft.type}</p>
                     </div>
                     <Input
                         width={'100%'}
                         onChange={(e) => {
+                            console.log(e)
                             setCurrency(e.target.value);
                         }}
-                        value={getWrappedNative(chainId) || ""}
                         label="Currency Address"
                     />
                     <div style={{ width: '100%', display: 'flex', gap: '10px' }}>
-                        {
-                            getWrappedNativeLogo(chainId) && (
-                                <Select
-                                    defaultOptionIndex={0}
-                                    label={'Currency'}
-                                    onChange={(e) => {
-                                        setCurrency(e.id)
-                                    }}
-                                    options={[
-                                        {
-                                            id: getWrappedNative(chainId),
-                                            label: getWrappedNativeSymbol(chainId),
-                                            prefix: <img src={getWrappedNativeLogo(chain)}  alt={""}/>
-                                        },
-                                    ]}
-                                />
-                            )
-                        }
+                        <Select
+                            defaultOptionIndex={0}
+                            label={'Currency'}
+                            onChange={() => {
+                            }}
+                            options={[
+                                {
+                                    id: getNativeByChain(chainId),
+                                    label: getNativeByChain(chainId),
+                                    tokenAddress: '0x0000000000000000000000000000000000000000',
+                                },
+                            ]}
+                        />
                         <Input
-                            width={'100%'}
+                            width={'70%'}
                             onChange={(e) =>
                                 (e as any).target.value > 0 ? setPrice(Moralis.Units.ETH(String((e as any).target.value))) : null
                             }

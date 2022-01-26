@@ -3,8 +3,6 @@ export const networkConfigs = {
     currencySymbol: "ETH",
     blockExplorerUrl: "https://etherscan.io/",
     wrapped: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-    wrappedSymbol: "WETH",
-    wrappedLogo: "https://etherscan.io/token/images/weth_28.png",
   },
   "0x3": {
     currencySymbol: "ETH",
@@ -44,7 +42,6 @@ export const networkConfigs = {
     rpcUrl: "https://bsc-dataseed.binance.org/",
     blockExplorerUrl: "https://bscscan.com/",
     wrapped: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
-    wrappedSymbol: "WBNB",
   },
   "0x61": {
     chainId: 97,
@@ -62,8 +59,6 @@ export const networkConfigs = {
     rpcUrl: "https://rpc-mainnet.maticvigil.com/",
     blockExplorerUrl: "https://explorer-mainnet.maticvigil.com/",
     wrapped: "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",
-    wrappedSymbol: "WMATIC",
-    wrappedLogo: "https://polygonscan.com/token/images/wMatic_32.png",
   },
   "0x13881": {
     chainId: 80001,
@@ -84,9 +79,3 @@ export const getExplorer = (chain) => networkConfigs[chain]?.blockExplorerUrl;
 
 export const getWrappedNative = (chain) =>
   networkConfigs[chain]?.wrapped || null;
-
-export const getWrappedNativeSymbol = (chain) =>
-    networkConfigs[chain]?.wrappedSymbol || null;
-
-export const getWrappedNativeLogo = (chain) =>
-    networkConfigs[chain]?.wrappedSymbol || null;
