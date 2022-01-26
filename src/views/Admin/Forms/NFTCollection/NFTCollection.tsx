@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { Form, Loading, Notification } from 'web3uikit';
+import { Form, Notification } from 'web3uikit';
 import React, { useState } from 'react';
 import useRegistry from '../../Module/contracts/Registry/useRegistry';
 import { useChain, useMoralis, useMoralisFile, useMoralisWeb3Api } from 'react-moralis';
@@ -15,17 +15,16 @@ interface INFTCollectionForm {
     web3?: any;
 }
 const NFTCollectionForm: React.FC<INFTCollectionForm> = ({ web3 }) => {
-    const { deployErr, isLoading, setLoading } = useRegistry();
-    const { addModule, protocolAddress, forwarder } = useProtocol();
+    const { deployErr } = useRegistry();
+    const { addModule, protocolAddress, forwarder, isAddingModule } = useProtocol();
     const { token } = useMoralisWeb3Api();
     const { account } = useMoralis();
     const { saveFile } = useMoralisFile();
     const { chainId } = useChain();
     const [stage, setStage] = useState('default');
     const { push: pushToHistory } = useHistory();
-
+    console.log('stage', stage);
     const uploadNFTCollection = (e: any) => {
-        setLoading(true);
         setStage('uploading');
         let metadata = {
             name: e.name,
@@ -65,16 +64,19 @@ const NFTCollectionForm: React.FC<INFTCollectionForm> = ({ web3 }) => {
     };
 
     const syncNFTContract = async (receipt) => {
+        console.log('receipt', receipt);
         setStage('syncing');
         await token.syncNFTContract({
             address: receipt.contractAddress,
             chain: chainId as any,
         });
         setStage('isAddingModule');
-        addModule(2, receipt.contractAddress).then(() => {
-                pushToHistory('/admin');
-            })
-            .finally(() => setLoading(false));
+        addModule(2, receipt.contractAddress);
+        // .then(() => {
+        //     console.log('redirect');
+        //     // pushToHistory('/admin');
+        // });
+        // .finally(() => setLoading(false));
     };
 
     const onSubmit = ({ data }) => {
@@ -107,9 +109,9 @@ const NFTCollectionForm: React.FC<INFTCollectionForm> = ({ web3 }) => {
                 </div>
                 <Form
                     buttonConfig={{
-                        disabled: isLoading,
+                        disabled: stage !== 'default',
                         isFullWidth: true,
-                        isLoading,
+                        isLoading: stage !== 'default',
                         onClick: () => console.log(),
                         text: 'Deploy',
                         theme: 'primary',

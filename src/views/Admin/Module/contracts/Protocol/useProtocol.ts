@@ -12,7 +12,7 @@ const useProtocol = () => {
     const { data: dataModuleById, fetch: fetchModuleById } = useWeb3ExecuteFunction();
     const { data: dataWithdrawFunds, fetch: fetchWithdrawFunds } = useWeb3ExecuteFunction();
     const { data: dataHasAdminRole, fetch: fetchHasAdminRole } = useWeb3ExecuteFunction();
-    const [addingModule, setIsAddingModule] = useState<boolean>(false);
+    const [isAddingModule, setIsAddingModule] = useState<boolean>(false);
     const { addModuleAbi, getModulesAbi, withdrawFundsAbi, hasRoleAbi } = protocolInterface();
 
     useEffect(() => {
@@ -48,12 +48,14 @@ const useProtocol = () => {
                 },
             },
             onSuccess: (tx) => {
+                console.log("tx", tx)
                 tx.wait(() => {
                     setIsAddingModule(false);
+                    console.log('eeeeeeeeeeeeeeeeee')
                 });
             },
             onError: () => setIsAddingModule(false),
-        }).then();
+        });
     };
 
     /**
@@ -137,7 +139,7 @@ const useProtocol = () => {
 
     return {
         addModule,
-        addingModule,
+        isAddingModule,
         checkIfUserIsAdmin,
         dataHasAdminRole,
         projectChain,
